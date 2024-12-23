@@ -75,6 +75,11 @@ Frontend:
 - Axios (w instances in a custom hook)
 - Toastify
 
+Frontend Hydration & Rendering:
+
+- SPA (CRA)
+	- Why SPA?: Since this application requires completely private access and does not have content value like blogs, e-commerce, or news websites, there is no need to set up infrastructures that facilitate indexing by search engine bots. It makes sense for applications that require entirely private access to operate solely on the client side and generally do not require SSR (Server-Side Rendering) or SSG (Static Site Generation). Therefore, it was not developed using Next.js.
+
 ## Installation
 
 To run this app on your local, run commands below on the terminal:
