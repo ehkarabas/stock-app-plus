@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Stock Management System" />
+    <!-- manifest.json dosyası, bir web uygulamasını tarayıcıda daha çok bir mobil uygulama gibi hissettirmek için kullanılan bir yapılandırma dosyasıdır. Bu dosya sayesinde, uygulamanızın başlatılacağı URL, uygulama adı, uygulama ikonları gibi bilgileri belirtebilirsiniz. Özellikle PWA (Progressive Web Application) yani kademeli web uygulamalarında bu dosya çok önemlidir.  -->
+    <!-- short_name ve name: Uygulamanızın adını belirtir. Kısa ad, genellikle ana ekrana eklenirken kullanılır.
+    icons: Uygulamanızın farklı boyutlardaki ikonlarını içerir. Bu ikonlar, uygulamanın ana ekran ikonu, başlatma ekranı ikonu gibi yerlerde kullanılır.
+    start_url: Uygulamanın başlatılacağı URL'i belirtir.
+    display: Uygulamanın görüntülenme modunu belirtir. Örneğin "standalone" modu, uygulamanın kendi başına, tarayıcı çubuğu olmadan çalıştırılmasını sağlar.
+    theme_color ve background_color: Uygulamanın tema ve arka plan rengini belirtir. -->
+    <!-- 192x192 ve 512x512 boyutları, genellikle PWA için kullanılan standart boyutlardır. 192x192 piksel boyutu, çoğu Android cihazda ana ekran ikonu olarak kullanılmak üzere idealdir. 512x512 piksel boyutu ise, genellikle uygulama mağazalarında ve başlatma ekranında kullanılan daha yüksek çözünürlüklü bir ikon için tercih edilir. -->
+    <!-- apple-touch-icon, iOS cihazlarında web uygulamanızın ana ekran ikonu olarak kullanılacak resmi belirtir. Bu ikon, kullanıcılar uygulamanızı iPhone veya iPad'lerinin ana ekranına eklediğinde görünen ikondur. %PUBLIC_URL% joker karakteri, genellikle projenin kamu klasörünü belirtir, böylece doğru dosya yolu dinamik olarak çözümlenebilir. -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Stock App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

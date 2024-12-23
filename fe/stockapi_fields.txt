@@ -1,0 +1,127 @@
+sales -> stock/sales/
+
+model.schema set transform toJSON -> ret.id = ret._id; -> MUI DataGrid row unique identifier, getRowId'ye gerek kalmadan algilamasi icin, default olarak cekilen veri setindeki(rows'a girilen) id'yi kullanir.
+
+brand -> brandData brand_id ref virtual ve model.schema set transform toJSON ret.brand = doc.brandData ? doc.brandData.name : ''; -> populate({path:"brandData",select:"name"},{path:"productData",select:"name"})
+product -> productData product_id ref virtual ve model.schema set transform toJSON ret.product = doc.productData ? doc.productData.name : ''; -> populate({path:"brandData",select:"name"},{path:"productData",select:"name"})
+quantity -> 0 dan buyuk olmali, product quantity'i create ve update'te azaltmali, delete'te product quantity'i this.quantity kadar artirmali
+price
+price_total -> model pre save quantity veya price modified olduysa veya isNew ise this quantity * this price
+
+purchases -> stock/purchases/
+
+model.schema set transform toJSON -> ret.id = ret._id; -> MUI DataGrid row unique identifier, getRowId'ye gerek kalmadan algilamasi icin, default olarak cekilen veri setindeki(rows'a girilen) id'yi kullanir.
+
+firm ->  firmData firm_id ref virtual ve model.schema set transform toJSON ret.firm = doc.firmData ? doc.firmData.name : ''; -> populate({path:"firmData",select:"name"},{path:"brandData",select:"name"},{path:"productData",select:"name"})
+brand ->  brandData brand_id ref virtual ve model.schema set transform toJSON ret.brand = doc.brandData ? doc.brandData.name : ''; -> populate({path:"firmData",select:"name"},{path:"brandData",select:"name"},{path:"productData",select:"name"})
+product -> productData product_id ref virtual ve model.schema set transform toJSON ret.product = doc.productData ? doc.productData.name : ''; -> populate({path:"firmData",select:"name"},{path:"brandData",select:"name"},{path:"productData",select:"name"})
+quantity -> 0 dan buyuk olmali, product quantity'i create ve update'te artirmali, delete'te product quantity'i this.quantity kadar azaltmali
+price
+price_total -> model pre save quantity veya price modified olduysa(controller'da update save ile yapilmali) veya isNew ise this quantity * this price
+
+firms -> stock/firms/
+
+name
+phone
+address
+image
+
+products -> stock/products/
+
+model.schema set transform toJSON -> ret.id = ret._id; -> MUI DataGrid row unique identifier, getRowId'ye gerek kalmadan algilamasi icin, default olarak cekilen veri setindeki(rows'a girilen) id'yi kullanir.
+
+category -> categoryData category_id ref virtual ve model.schema set transform toJSON ret.category = doc.categoryData ? doc.categoryData.name : ''; -> populate({path:"categoryData",select:"name"},{path:"productData",select:"name"})
+brand -> brandData brand_id ref virtual ve model.schema set transform toJSON ret.brand = doc.brandData ? doc.brandData.name : ''; -> populate({path:"categoryData",select:"name"},{path:"productData",select:"name"})
+name,
+quantity -> purchase ve sale quantity'lerine gore(create, update, delete) otomatik hesaplanmali, default 0
+
+
+categories -> stock/categories/
+name
+
+brands -> stock/brands/
+name
+image
+
+user -> account/
+username
+password
+email
+first_name
+last_name
+is_active
+is_staff
+is_admin
+
+login -> auth/login/
+
+logout -> auth/logout/
+
+register -> account/register/
+
+
+PurchaseSchema.pre('save', async function(next) {
+  const product = await Product.findById(this.product);
+  if (this.isNew) {
+    // Yeni bir satın alma işlemi yapıldığında ürün miktarını artır
+    product.quantity += this.quantity;
+  } else {
+    // Satın alma işlemi güncellenirse, miktar farkını hesapla ve güncelle
+    const oldDoc = await Purchase.findById(this._id);
+    const quantityChange = this.quantity - oldDoc.quantity;
+    product.quantity += quantityChange;
+  }
+  await product.save();
+  next();
+});
+
+PurchaseSchema.pre('remove', async function(next) {
+  const product = await Product.findById(this.product);
+  // Satın alma işlemi silinirken, eğer stok miktarı silinen miktardan az ise hata fırlat
+  if (product.quantity < this.quantity) {
+    throw new Error('The stock quantity is so low that it becomes negative. The transaction has been cancelled.');
+  } else {
+    // Yeterli stok varsa, satın alınan miktarı stoktan düş
+    product.quantity -= this.quantity;
+    await product.save();
+  }
+  next();
+});
+
+
+SaleSchema.pre('save', async function(next) {
+  const product = await Product.findById(this.product);
+  let quantityChange = 0;
+
+  if (this.isNew) {
+    // Yeni bir satış işlemi yapıldığında, eğer yeterli stok varsa azalt
+    if (product.quantity >= this.quantity) {
+      product.quantity -= this.quantity;
+    } else {
+      // Yeterli stok yoksa işlemi iptal et ve hata fırlat
+      throw new Error('Insufficient stock.');
+    }
+  } else {
+    // Satış işlemi güncellenirse, eski ve yeni miktar arasındaki farkı hesapla
+    const oldDoc = await Sale.findById(this._id);
+    quantityChange = oldDoc.quantity - this.quantity;
+
+    // Güncelleme sonucu stok negatife düşerse işlemi geri al
+    if (product.quantity + quantityChange < 0) {
+      throw new Error('Insufficient stock.');
+    } else {
+      product.quantity += quantityChange;
+    }
+  }
+
+  await product.save();
+  next();
+});
+
+SaleSchema.pre('remove', async function(next) {
+  const product = await Product.findById(this.product);
+  // Satış işlemi silindiğinde, satılan ürün miktarını stok'a geri ekle
+  product.quantity += this.quantity;
+  await product.save();
+  next();
+});

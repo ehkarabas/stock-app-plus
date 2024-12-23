@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply min-h-screen font-firaCode text-black dark:bg-slate-400 dark:text-white;
+  }
+
+  input,
+  textarea {
+    @apply ring-0 !important;
+  }
+
+  input {
+    @apply hover:dark:outline-white hover:outline-yellow-500 !important;
+  }
+}
+
+@layer components {
+  .btn-success {
+    @apply focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-lg px-5 py-2.5 mr-2 mb-2 w-full mt-[15px] dark:bg-cyan-600 dark:hover:bg-green-700 dark:focus:ring-green-900;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Fira Code", monospace;
+}
